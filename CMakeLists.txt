@@ -23,6 +23,10 @@ target_include_directories(${PROJECT_NAME}
 )
 # Target C++ standard 23
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
+# If using GNU, taeget stdc++exp
+if (MINGW AND CMAKE_CXX_COMPILER_ID STREQUAL GNU)
+        target_link_libraries(${PROJECT_NAME} stdc++exp)
+endif()
 
 # Examples
 if(KI_EXAMPLE)
@@ -32,4 +36,6 @@ endif()
 # Tests
 if(KI_TEST)
         message("Building Tests")
+        enable_testing()
+        add_subdirectory(test)
 endif()
