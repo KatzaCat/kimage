@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "imagereader.hpp"
@@ -7,16 +8,17 @@
 namespace k {
         class Image {
         public:
-                Image();
-                Image(ImageReader *reader);
-                Image(const std::string file, ImageReader *reader);
+                Image() = default;
 
-                bool load(const std::string file);
+                Image(std::unique_ptr<ImageReader> reader);
+                Image(std::unique_ptr<ImageReader> reader, const std::string file);
 
-                bool setReder(ImageReader *reader);
+                bool load(std::string file);
 
-                image::DataResopnce getData();
+                bool setReder(std::unique_ptr<ImageReader> reader);
+
+                image_data::Resopnce getData();
         private:
-                ImageReader *reader = nullptr;
+                std::unique_ptr<ImageReader> reader = {};
         };
 }

@@ -1,12 +1,10 @@
 #include <imagereader/bmp.hpp>
 #include <kimage.hpp>
+#include <memory>
 
 int main() {
-        // create dependency
-        k::reader::BMP BMPReader = {};
-
         // inject dependency
-        k::Image image(&BMPReader);
+        k::Image image(std::make_unique<k::BMPReader>());
 
         // test to see if works
         image.load("test.bmp");
