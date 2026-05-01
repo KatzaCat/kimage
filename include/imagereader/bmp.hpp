@@ -3,11 +3,12 @@
 #include "../imagereader.hpp"
 
 namespace k {
-        namespace reader {
-                class BMP :public ImageReader {
-                        bool load(const std::string file) override;
+        class BMPReader : public ImageReader {
+        public:
+                virtual ~BMPReader() override = default;
 
-                        image::DataResopnce getData() override;
-                };
-        }
+                virtual bool load(const std::string file) override;
+
+                virtual image_data::Resopnce getData() override;
+        };
 }

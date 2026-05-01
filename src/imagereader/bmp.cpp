@@ -5,17 +5,17 @@
 #include <print>
 #include <string>
 
-bool k::reader::BMP::load(const std::string file) {
+bool k::BMPReader::load(const std::string file) {
         std::println("TODO: BMP load");
 
         return true;
 }
 
-k::image::DataResopnce k::reader::BMP::getData() {
+k::image_data::Resopnce k::BMPReader::getData() {
         std::println("TODO: BMP getData");
 
-        k::image::DataResopnce responce = {};
-        responce.type = image::DATA;
+        image_data::Resopnce responce = {};
+        responce.type = image_data::DATA;
         responce.as.data = std::byte(1);
 
         return responce;
