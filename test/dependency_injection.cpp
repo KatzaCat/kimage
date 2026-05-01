@@ -7,7 +7,7 @@ int main() {
         k::Image image(std::make_unique<k::BMPReader>());
 
         // test to see if works
-        image.load("test.bmp");
+        image.load("BMP_test.bmp");
         (void)image.getData();
 
         return 0;
