@@ -23,5 +23,8 @@ bool k::Image::setReder(std::unique_ptr<ImageReader> reader) {
         return true;
 }
 
-k::image_data::Resopnce k::Image::getData()
+k::image_data::Response k::Image::getData()
 {return this->reader->getData();}
+
+void k::Image::printData()
+{this->printData();}

@@ -8,7 +8,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Add the library
 add_library(${PROJECT_NAME} STATIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kimage.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src//imagereader/bmp.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/imagereader.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/imagereader/bmp.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/tools/to_int.cpp
 )
 # Create the alias
 add_library(kimage::kimage ALIAS ${PROJECT_NAME})

@@ -17,7 +17,9 @@ namespace k {
 
                 bool setReder(std::unique_ptr<ImageReader> reader);
 
-                image_data::Resopnce getData();
+                image_data::Response getData();
+
+                void printData();
         private:
                 std::unique_ptr<ImageReader> reader = {};
         };
