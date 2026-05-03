@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstddef>
-#include <cstdint>
 #include <fstream>
 #include <string>
 #include <variant>
@@ -33,18 +32,7 @@ namespace k {
 
                 virtual void printData() = 0;
 
-        private:
-                size_t byte_index = 0;
-
         protected:
                 void populateDataFromFile(std::ifstream &file);
-
-                std::byte getNextByte();
-
-                uint16_t getNextTwoBytesLSB();
-                uint32_t getNextFourBytesLSB();
-
-                uint16_t getNextTwoBytesMSB();
-                uint32_t getNextFourBytesMSB();
         };
 }
