@@ -33,6 +33,6 @@ namespace k {
                 virtual void printData() = 0;
 
         protected:
-                void populateDataFromFile(std::ifstream &file);
+                bool populateDataFromFile(std::ifstream &file);
         };
 }

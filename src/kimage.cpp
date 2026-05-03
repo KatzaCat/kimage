@@ -27,4 +27,4 @@ k::image_data::Response k::Image::getData()
 {return this->reader->getData();}
 
 void k::Image::printData()
-{this->printData();}
+{this->reader->printData();}
