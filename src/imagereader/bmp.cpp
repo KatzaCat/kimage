@@ -127,88 +127,102 @@ void k::BMPReader::populatePixelData() {
 }
 
 void k::BMPReader::process1Bit() {
-        int32_t colors_written = 0;
-        for (size_t pixel_data_index = this->pixel_data_offset; pixel_data_index < this->data.size(); pixel_data_index++) {
-                std::bitset<8> bits = k::tools::toBitset(this->getByte(pixel_data_index));
+        size_t pixel_data_index = this->pixel_data_offset;
 
-                for(size_t bit_index = bits.size() - 1; bit_index >= 0; bit_index--) {
-                        this->pixel_data.push_back(this->color_table.at(bits[bit_index]));
-                        colors_written += 1;
+        int32_t bytes_per_row = (this->image_width + 1) / 8;
+        int32_t padding = (4 - (bytes_per_row % 4)) % 4;
+
+        size_t pixels_read = 0;
+        for (size_t image_row = 0; image_row < this->image_height; image_row++) {
+                pixels_read = 0;
+
+                for (size_t byte_count = 0; byte_count < bytes_per_row; byte_count++) {
+                        std::bitset<8> bitset = k::tools::toBitset(this->getByte(pixel_data_index++));
+
+                        for (uint8_t index = 0; (index < bitset.size() && (pixels_read < this->image_width)); index++)
+                        {this->pixel_data.push_back(bitset[index]); pixels_read++;}
                 }
 
-                if (colors_written == this->image_width) {
-                        int32_t width_in_bytes = (this->image_width / 2);
-                        int32_t byes_per_row = static_cast<int32_t>((4 / static_cast<float>(width_in_bytes)) * 10);
-
-                        pixel_data_index += byes_per_row - width_in_bytes;
-                        colors_written = 0;
-                }
+                pixel_data_index += padding;
         }
 }
 
 void k::BMPReader::process2Bit() {
-        int32_t colors_written = 0;
-        for (size_t pixel_data_index = this->pixel_data_offset; pixel_data_index < this->data.size(); pixel_data_index++) {
-                std::byte byte = this->getByte(pixel_data_index);
+        size_t pixel_data_index = this->pixel_data_offset;
 
-                uint8_t color_index_1 = (static_cast<unsigned char>(byte) >> 6) & 0b00000011;
-                uint8_t color_index_2 = (static_cast<unsigned char>(byte) >> 4) & 0b00000011;
-                uint8_t color_index_3 = (static_cast<unsigned char>(byte) >> 2) & 0b00000011;
-                uint8_t color_index_4 =  static_cast<unsigned char>(byte)       & 0b00000011;
+        int32_t bytes_per_row = (this->image_width + 1) / 4;
+        int32_t padding = (4 - (bytes_per_row % 4)) % 4;
 
-                this->pixel_data.push_back(this->color_table.at(color_index_1));
-                this->pixel_data.push_back(this->color_table.at(color_index_2));
-                this->pixel_data.push_back(this->color_table.at(color_index_3));
-                this->pixel_data.push_back(this->color_table.at(color_index_4));
+        size_t pixels_read = 0;
+        for (size_t image_row = 0; image_row < this->image_height; image_row++) {
+                pixels_read = 0;
 
-                colors_written += 4;
-                if (colors_written == this->image_width) {
-                        int32_t width_in_bytes = (this->image_width / 2);
-                        int32_t byes_per_row = static_cast<int32_t>((4 / static_cast<float>(width_in_bytes)) * 10);
+                for (size_t byte_count = 0; byte_count < bytes_per_row; byte_count++) {
+                        std::byte byte = this->getByte(pixel_data_index++);
 
-                        pixel_data_index += byes_per_row - width_in_bytes;
-                        colors_written = 0;
+                        uint8_t color_index_1 = (static_cast<uint8_t>(byte) >> 6) & 0b00000011;
+                        uint8_t color_index_2 = (static_cast<uint8_t>(byte) >> 4) & 0b00000011;
+                        uint8_t color_index_3 = (static_cast<uint8_t>(byte) >> 2) & 0b00000011;
+                        uint8_t color_index_4 =  static_cast<uint8_t>(byte)       & 0b00000011;
+
+                        if (pixels_read < this->image_width)
+                        {this->pixel_data.push_back(this->color_table.at(color_index_1)); pixels_read++;}
+                        if (pixels_read < this->image_width)
+                        {this->pixel_data.push_back(this->color_table.at(color_index_2)); pixels_read++;}
+                        if (pixels_read < this->image_width)
+                        {this->pixel_data.push_back(this->color_table.at(color_index_3)); pixels_read++;}
+                        if (pixels_read < this->image_width)
+                        {this->pixel_data.push_back(this->color_table.at(color_index_4)); pixels_read++;}
                 }
+
+                pixel_data_index += padding;
         }
 }
 
 void k::BMPReader::process4Bit() {
-        int32_t colors_written = 0;
-        for (size_t pixel_data_index = this->pixel_data_offset; pixel_data_index < this->data.size(); pixel_data_index++) {
-                std::byte byte = this->getByte(pixel_data_index);
+        size_t pixel_data_index = this->pixel_data_offset;
 
-                uint8_t color_index_1 = (static_cast<unsigned char>(byte) >> 4) & 0b00001111;
-                uint8_t color_index_2 =  static_cast<unsigned char>(byte)       & 0b00001111;
+        int32_t bytes_per_row = (this->image_width + 1) / 2;
+        int32_t padding = (4 - (bytes_per_row % 4)) % 4;
 
-                this->pixel_data.push_back(this->color_table.at(color_index_1));
-                this->pixel_data.push_back(this->color_table.at(color_index_2));
+        size_t pixels_read = 0;
+        for (size_t image_row = 0; image_row < this->image_height; image_row++) {
+                pixels_read = 0;
 
-                colors_written += 2;
-                if (colors_written == this->image_width) {
-                        int32_t width_in_bytes = this->image_width / 2;
-                        int32_t byes_per_row = static_cast<int32_t>((4 / static_cast<float>(width_in_bytes)) * 10);
+                for (size_t byte_count = 0; byte_count < bytes_per_row; byte_count++) {
+                        std::byte byte = this->getByte(pixel_data_index++);
 
-                        pixel_data_index += byes_per_row - width_in_bytes;
-                        colors_written = 0;
+                        uint8_t color_index_1 = (static_cast<uint8_t>(byte) >> 4) & 0b00001111;
+                        uint8_t color_index_2 =  static_cast<uint8_t>(byte)       & 0b00001111;
+
+                        if (pixels_read < this->image_width)
+                        {this->pixel_data.push_back(this->color_table.at(color_index_1)); pixels_read++;}
+                        if (pixels_read < this->image_width)
+                        {this->pixel_data.push_back(this->color_table.at(color_index_2)); pixels_read++;}
                 }
+
+                pixel_data_index += padding;
         }
 }
 
 void k::BMPReader::process8Bit() {
-        int32_t colors_written = 0;
-        for (size_t pixel_data_index = this->pixel_data_offset; pixel_data_index < this->data.size(); pixel_data_index++) {
-                std::byte byte = this->getByte(pixel_data_index);
+        size_t pixel_data_index = this->pixel_data_offset;
 
-                this->pixel_data.push_back(this->color_table.at(static_cast<unsigned char>(byte)));
+        int32_t bytes_per_row = (this->image_width + 1) / 1;
+        int32_t padding = (4 - (bytes_per_row % 4)) % 4;
 
-                colors_written += 1;
-                if (colors_written == this->image_width) {
-                        int32_t width_in_bytes = this->image_width / 2;
-                        int32_t byes_per_row = static_cast<int32_t>((4 / static_cast<float>(width_in_bytes)) * 10);
+        size_t pixels_read = 0;
+        for (size_t image_row = 0; image_row < this->image_height; image_row++) {
+                pixels_read = 0;
 
-                        pixel_data_index += byes_per_row - width_in_bytes;
-                        colors_written = 0;
+                for (size_t byte_count = 0; byte_count < bytes_per_row; byte_count++) {
+                        std::byte byte = this->getByte(pixel_data_index++);
+
+                        if (pixels_read < this->image_width)
+                        {this->pixel_data.push_back(this->color_table.at(static_cast<uint8_t>(byte))); pixels_read++;}
                 }
+
+                pixel_data_index += padding;
         }
 }
 
