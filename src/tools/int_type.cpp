@@ -1,4 +1,5 @@
 #include "tools/int_type.hpp"
+#include <bitset>
 #include <cstdint>
 
 uint16_t k::tools::toInt16(std::byte byte1, std::byte byte2) {
@@ -20,3 +21,6 @@ uint32_t k::tools::toInt32(uint16_t frount, uint16_t back) {
 
         return return_value;
 }
+
+std::bitset<8> k::tools::toBitset(std::byte byte)
+{return std::bitset<8>(static_cast<unsigned char>(byte));}
