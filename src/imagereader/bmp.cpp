@@ -2,8 +2,10 @@
 #include "tools/int_type.hpp"
 #include "imagereader.hpp"
 
+#include <bitset>
 #include <cmath>
 #include <cstddef>
+#include <cstdint>
 #include <fstream>
 #include <ios>
 #include <print>
@@ -19,6 +21,7 @@ bool k::BMPReader::load(const std::string file_name) {
         this->populateDataFromFile(binary_file);
         this->populateBMPData();
         this->populateColorTable();
+        this->populatePixelData();
 
         binary_file.close();
 
@@ -41,7 +44,7 @@ void k::BMPReader::printData() {
         }
         std::print("\n");
 
-        std::println("Pixel Array Offset : {:8} -> 0x{:08X}", this->pixel_array_offset, this->pixel_array_offset);
+        std::println("Pixel Array Offset : {:8} -> 0x{:08X}", this->pixel_data_offset, this->pixel_data_offset);
         std::println("Image Width        : {:8} -> 0x{:08X}", this->image_width, this->image_width);
         std::println("Image Height       : {:8} -> 0x{:08X}", this->image_height, this->image_height);
         std::println("Bits Per Pixel     : {:8} -> 0x{:08X}", this->bits_per_pixel, this->bits_per_pixel);
@@ -52,6 +55,16 @@ void k::BMPReader::printData() {
         for (size_t index = 0; index < this->color_table.size(); index++)
         {std::println("\t{:08X}, ", this->color_table.at(index));}
         std::println("]");
+
+        std::println("Pixel Data Size    : {:8} -> 0x{:08X}", this->pixel_data.size(), this->pixel_data.size());
+        std::print  ("Pixel Data         : [\n\t");
+        for (size_t index = 0; index < this->pixel_data.size(); index++) {
+                std::print("{:08X} ", this->pixel_data.at(index));
+
+                if (((index + 1) % this->image_width) == 0)
+                {std::print("\n\t");}
+        }
+        std::println("]");
 }
 
 int32_t k::BMPReader::getWidth()
@@ -61,7 +74,7 @@ int32_t k::BMPReader::getHeight()
 {return this->image_height;}
 
 void k::BMPReader::populateBMPData() {
-        this->pixel_array_offset = this->getFourBytesLittleEndian(10);
+        this->pixel_data_offset = this->getFourBytesLittleEndian(10);
 
         this->image_width = this->getFourBytesLittleEndian(18);
         this->image_height = this->getFourBytesLittleEndian(22);
@@ -100,3 +113,107 @@ void k::BMPReader::populateColorTable() {
                 );
         }
 }
+
+void k::BMPReader::populatePixelData() {
+        switch (this->bits_per_pixel) {
+                case 1:  this->process1Bit();  break;
+                case 2:  this->process2Bit();  break;
+                case 4:  this->process4Bit();  break;
+                case 8:  this->process8Bit();  break;
+                case 16: this->process16Bit(); break;
+                case 24: this->process24Bit(); break;
+                case 32: this->process32Bit(); break;
+        }
+}
+
+void k::BMPReader::process1Bit() {
+        int32_t colors_written = 0;
+        for (size_t pixel_data_index = this->pixel_data_offset; pixel_data_index < this->data.size(); pixel_data_index++) {
+                std::bitset<8> bits = k::tools::toBitset(this->getByte(pixel_data_index));
+
+                for(size_t bit_index = bits.size() - 1; bit_index >= 0; bit_index--) {
+                        this->pixel_data.push_back(this->color_table.at(bits[bit_index]));
+                        colors_written += 1;
+                }
+
+                if (colors_written == this->image_width) {
+                        int32_t width_in_bytes = (this->image_width / 2);
+                        int32_t byes_per_row = static_cast<int32_t>((4 / static_cast<float>(width_in_bytes)) * 10);
+
+                        pixel_data_index += byes_per_row - width_in_bytes;
+                        colors_written = 0;
+                }
+        }
+}
+
+void k::BMPReader::process2Bit() {
+        int32_t colors_written = 0;
+        for (size_t pixel_data_index = this->pixel_data_offset; pixel_data_index < this->data.size(); pixel_data_index++) {
+                std::byte byte = this->getByte(pixel_data_index);
+
+                uint8_t color_index_1 = (static_cast<unsigned char>(byte) >> 6) & 0b00000011;
+                uint8_t color_index_2 = (static_cast<unsigned char>(byte) >> 4) & 0b00000011;
+                uint8_t color_index_3 = (static_cast<unsigned char>(byte) >> 2) & 0b00000011;
+                uint8_t color_index_4 =  static_cast<unsigned char>(byte)       & 0b00000011;
+
+                this->pixel_data.push_back(this->color_table.at(color_index_1));
+                this->pixel_data.push_back(this->color_table.at(color_index_2));
+                this->pixel_data.push_back(this->color_table.at(color_index_3));
+                this->pixel_data.push_back(this->color_table.at(color_index_4));
+
+                colors_written += 4;
+                if (colors_written == this->image_width) {
+                        int32_t width_in_bytes = (this->image_width / 2);
+                        int32_t byes_per_row = static_cast<int32_t>((4 / static_cast<float>(width_in_bytes)) * 10);
+
+                        pixel_data_index += byes_per_row - width_in_bytes;
+                        colors_written = 0;
+                }
+        }
+}
+
+void k::BMPReader::process4Bit() {
+        int32_t colors_written = 0;
+        for (size_t pixel_data_index = this->pixel_data_offset; pixel_data_index < this->data.size(); pixel_data_index++) {
+                std::byte byte = this->getByte(pixel_data_index);
+
+                uint8_t color_index_1 = (static_cast<unsigned char>(byte) >> 4) & 0b00001111;
+                uint8_t color_index_2 =  static_cast<unsigned char>(byte)       & 0b00001111;
+
+                this->pixel_data.push_back(this->color_table.at(color_index_1));
+                this->pixel_data.push_back(this->color_table.at(color_index_2));
+
+                colors_written += 2;
+                if (colors_written == this->image_width) {
+                        int32_t width_in_bytes = this->image_width / 2;
+                        int32_t byes_per_row = static_cast<int32_t>((4 / static_cast<float>(width_in_bytes)) * 10);
+
+                        pixel_data_index += byes_per_row - width_in_bytes;
+                        colors_written = 0;
+                }
+        }
+}
+
+void k::BMPReader::process8Bit() {
+        int32_t colors_written = 0;
+        for (size_t pixel_data_index = this->pixel_data_offset; pixel_data_index < this->data.size(); pixel_data_index++) {
+                std::byte byte = this->getByte(pixel_data_index);
+
+                this->pixel_data.push_back(this->color_table.at(static_cast<unsigned char>(byte)));
+
+                colors_written += 1;
+                if (colors_written == this->image_width) {
+                        int32_t width_in_bytes = this->image_width / 2;
+                        int32_t byes_per_row = static_cast<int32_t>((4 / static_cast<float>(width_in_bytes)) * 10);
+
+                        pixel_data_index += byes_per_row - width_in_bytes;
+                        colors_written = 0;
+                }
+        }
+}
+
+void k::BMPReader::process16Bit() {}
+
+void k::BMPReader::process24Bit() {}
+
+void k::BMPReader::process32Bit() {}
