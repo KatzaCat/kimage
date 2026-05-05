@@ -2,6 +2,7 @@
 
 #include "../imagereader.hpp"
 #include <cstdint>
+#include <vector>
 
 namespace k {
         class BMPReader : public ImageReader {
@@ -25,7 +26,12 @@ namespace k {
                 int32_t image_height = 0;
 
                 uint16_t bits_per_pixel = 0;
+
+                uint32_t compression_level = 0;
+
+                std::vector<uint32_t> color_table = {};
         private:
                 void populateBMPData();
+                void populateColorTable();
         };
 }

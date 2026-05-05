@@ -1,6 +1,8 @@
 #include "imagereader/bmp.hpp"
+#include "tools/int_type.hpp"
 #include "imagereader.hpp"
 
+#include <cmath>
 #include <cstddef>
 #include <fstream>
 #include <ios>
@@ -16,6 +18,7 @@ bool k::BMPReader::load(const std::string file_name) {
 
         this->populateDataFromFile(binary_file);
         this->populateBMPData();
+        this->populateColorTable();
 
         binary_file.close();
 
@@ -42,6 +45,13 @@ void k::BMPReader::printData() {
         std::println("Image Width        : {:8} -> 0x{:08X}", this->image_width, this->image_width);
         std::println("Image Height       : {:8} -> 0x{:08X}", this->image_height, this->image_height);
         std::println("Bits Per Pixel     : {:8} -> 0x{:08X}", this->bits_per_pixel, this->bits_per_pixel);
+        std::println("Compression Level  : {:8} -> 0x{:08X}", this->compression_level, this->compression_level);
+
+        std::println("Color Table Size   : {:8} -> 0x{:08X}", this->color_table.size(), this->color_table.size());
+        std::println("Color Table        : [");
+        for (size_t index = 0; index < this->color_table.size(); index++)
+        {std::println("\t{:08X}, ", this->color_table.at(index));}
+        std::println("]");
 }
 
 int32_t k::BMPReader::getWidth()
@@ -57,4 +67,36 @@ void k::BMPReader::populateBMPData() {
         this->image_height = this->getFourBytesLittleEndian(22);
 
         this->bits_per_pixel = this->getTwoBytesLittleEndian(28);
+
+        this->compression_level = this->getFourBytesLittleEndian(30);
+}
+
+void k::BMPReader::populateColorTable() {
+        if (this->bits_per_pixel > 8) {
+                this->color_table.resize(0);
+                return;
+        }
+
+        size_t offset = 54;
+        size_t bytes_per_entry = 4;
+
+        this->color_table.resize(std::pow(2, this->bits_per_pixel));
+
+        size_t compression_offset_adition = 0;
+        if      (this->compression_level == 3) {compression_offset_adition = 12;}
+        else if (this->compression_level == 6) {compression_offset_adition = 16;}
+        size_t color_table_offset = offset + compression_offset_adition;
+
+        for (size_t index = 0; index < this->color_table.size(); index++) {
+                size_t current_offset = color_table_offset + (bytes_per_entry * index);
+
+                std::byte red = this->getByte(current_offset + 2);
+                std::byte green = this->getByte(current_offset + 1);
+                std::byte blue = this->getByte(current_offset);
+
+                this->color_table.at(index) = tools::toInt32(
+                        tools::toInt16(red, green),
+                        tools::toInt16(blue, std::byte(0))
+                );
+        }
 }
