@@ -6,7 +6,7 @@
 int main() {
         k::Image bmp_file(std::make_unique<k::BMPReader>());
 
-        bmp_file.load("images/BMP_test.bmp");
+        bmp_file.load("images/BMP_test5.bmp");
         bmp_file.printData();
 
         return 0;
