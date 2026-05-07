@@ -1,4 +1,5 @@
 #include "imagereader.hpp"
+#include "tools/int_type.hpp"
 #include <cstddef>
 #include <cstdint>
 
@@ -20,40 +21,32 @@ bool k::ImageReader::populateDataFromFile(std::ifstream &file) {
         return true;
 }
 
-std::byte k::ImageReader::getCurrentByte() {
-        std::byte current_byte = std::byte(0);
-
-        if (this->data_index > this->data.size())
+std::byte k::ImageReader::getByte(size_t offset) {
+        if (offset >= this->data.size() || offset < 0)
         {return std::byte(0);}
-
-        current_byte = this->data.at(this->data_index);
-        this->data_index += 1;
-
-        return current_byte;
+        return this->data.at(offset);
 }
 
-uint16_t k::ImageReader::getCurrentTwoBytesBigEndian() {
-        return  static_cast<uint16_t>(this->getCurrentByte()) << 8 |
-                static_cast<uint16_t>(this->getCurrentByte());
+uint16_t k::ImageReader::getTwoBytesBigEndian(size_t offset)
+{return tools::toInt16(this->getByte(offset), this->getByte(offset + 1));}
+
+uint32_t k::ImageReader::getFourBytesBigEndian(size_t offset) {
+        return  tools::toInt32(
+                this->getFourBytesBigEndian(offset),
+                this->getFourBytesBigEndian(offset + 2)
+        );
 }
 
-uint32_t k::ImageReader::getCurrentFourBytesBigEndian() {
-        return  static_cast<uint32_t>(this->getCurrentTwoBytesBigEndian()) << 16 |
-                static_cast<uint32_t>(this->getCurrentTwoBytesBigEndian());
+uint16_t k::ImageReader::getTwoBytesLittleEndian(size_t offset) {
+        std::byte first_byte = this->getByte(offset);
+        std::byte second_byte = this->getByte(offset + 1);
+
+        return tools::toInt16(second_byte, first_byte);
 }
 
-uint16_t k::ImageReader::getCurrentTwoBytesLittleEndian() {
-        std::byte first_byte = this->getCurrentByte();
-        std::byte second_byte = this->getCurrentByte();
+uint32_t k::ImageReader::getFourBytesLittleEndian(size_t offset) {
+        uint16_t front_bytes = this->getTwoBytesLittleEndian(offset);
+        uint16_t back_bytes = this->getTwoBytesLittleEndian(offset + 2);
 
-        return  static_cast<uint16_t>(second_byte) << 8 |
-                static_cast<uint16_t>(first_byte);
-}
-
-uint32_t k::ImageReader::getCurrentFourBytesLittleEndian() {
-        uint16_t front_bytes = this->getCurrentTwoBytesLittleEndian();
-        uint16_t back_bytes = this->getCurrentTwoBytesLittleEndian();
-
-        return  static_cast<uint32_t>(back_bytes) << 16 |
-                static_cast<uint32_t>(front_bytes);
+        return  tools::toInt32(back_bytes, front_bytes);
 }

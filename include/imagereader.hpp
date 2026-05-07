@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cstddef>
+#include <cstdint>
 #include <fstream>
-#include <memory>
 #include <string>
 #include <variant>
 #include <vector>
@@ -16,7 +16,7 @@ namespace k {
 
                 struct Response {
                         Type type;
-                        std::variant<std::unique_ptr<std::byte>, int> information;
+                        std::variant<std::vector<std::byte>, int> information;
                 };
         }
 
@@ -31,17 +31,18 @@ namespace k {
                 virtual image_data::Response getData() = 0;
 
                 virtual void printData() = 0;
-        private:
-                size_t data_index = 0;
+
+                virtual int32_t getWidth() = 0;
+                virtual int32_t getHeight() = 0;
         protected:
                 bool populateDataFromFile(std::ifstream &file);
 
-                std::byte getCurrentByte();
+                std::byte getByte(size_t offset);
 
-                uint16_t getCurrentTwoBytesBigEndian();
-                uint32_t getCurrentFourBytesBigEndian();
+                uint16_t getTwoBytesBigEndian(size_t offset);
+                uint32_t getFourBytesBigEndian(size_t offset);
 
-                uint16_t getCurrentTwoBytesLittleEndian();
-                uint32_t getCurrentFourBytesLittleEndian();
+                uint16_t getTwoBytesLittleEndian(size_t offset);
+                uint32_t getFourBytesLittleEndian(size_t offset);
         };
 }
