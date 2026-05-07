@@ -193,7 +193,7 @@ void k::BMPReader::process16Bit() {
 
         uint16_t color_data = k::tools::toInt16(byte1, byte2);
 
-        std::byte red   = std::byte(((static_cast<uint8_t>(color_data >> 10) & 0b00011111) * 255) / 31);
+        std::byte red   = std::byte(((static_cast<uint8_t>(color_data >> 11) & 0b00011111) * 255) / 31);
         std::byte green = std::byte(((static_cast<uint8_t>(color_data >> 5)  & 0b00011111) * 255) / 31);
         std::byte blue  = std::byte(((static_cast<uint8_t>(color_data)       & 0b00011111) * 255) / 31);
         std::byte alfa  = std::byte(0xFF);
