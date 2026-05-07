@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 4.2.0)
 
-project(kimage LANGUAGES CXX VERSION 4.28.26)
+project(kimage LANGUAGES CXX VERSION 5.06.26)
 
 # Have CMake export compile commands
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
