@@ -1,7 +1,9 @@
 #pragma once
 
 #include "../imagereader.hpp"
+#include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <vector>
 
 namespace k {
@@ -30,11 +32,23 @@ namespace k {
                 uint32_t compression_level = 0;
 
                 std::vector<uint32_t> color_table = {};
+
                 std::vector<uint32_t> pixel_data = {};
+
+                size_t pixel_data_index = 0;
+
+                int32_t bytes_per_row = 0;
+                int32_t bytes_per_pixel = 0;
+
+                int32_t pixel_data_padding = 0;
+
+                size_t pixels_read = 0;
         private:
                 void populateBMPData();
                 void populateColorTable();
                 void populatePixelData();
+
+                void processPixelBytes(std::function<void()> function);
 
                 void process1Bit();
                 void process2Bit();
