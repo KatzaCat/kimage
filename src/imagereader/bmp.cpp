@@ -147,7 +147,7 @@ void k::BMPReader::process1Bit() {
         std::bitset<8> bitset = k::tools::toBitset(this->getByte(this->pixel_data_index++));
 
         for (uint8_t index = 0; (index < bitset.size() && (pixels_read < this->image_width)); index++)
-        {this->pixel_data.push_back(bitset[index]); pixels_read++;}
+        {this->pixel_data.push_back(this->color_table.at(bitset[index])); pixels_read++;}
 }
 
 void k::BMPReader::process2Bit() {
@@ -193,7 +193,7 @@ void k::BMPReader::process16Bit() {
 
         uint16_t color_data = k::tools::toInt16(byte1, byte2);
 
-        std::byte red   = std::byte(((static_cast<uint8_t>(color_data >> 10) & 0b00011111) * 255) / 31);
+        std::byte red   = std::byte(((static_cast<uint8_t>(color_data >> 11) & 0b00011111) * 255) / 31);
         std::byte green = std::byte(((static_cast<uint8_t>(color_data >> 5)  & 0b00011111) * 255) / 31);
         std::byte blue  = std::byte(((static_cast<uint8_t>(color_data)       & 0b00011111) * 255) / 31);
         std::byte alfa  = std::byte(0xFF);
