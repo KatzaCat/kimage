@@ -22,7 +22,7 @@ bool k::ImageReader::populateDataFromFile(std::ifstream &file) {
 }
 
 std::byte k::ImageReader::getByte(size_t offset) {
-        if (offset > this->data.size() || offset > this->data.size())
+        if (offset >= this->data.size() || offset < 0)
         {return std::byte(0);}
         return this->data.at(offset);
 }
