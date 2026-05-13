@@ -17,14 +17,23 @@ bool k::Image::load(const std::string file) {
         return true;
 }
 
+k::image_data::Response k::Image::getResponse()
+{return this->reader->getResponse();}
+
+std::vector<unsigned char> k::Image::getRawData()
+{return this->reader->getRawData();}
+
+int32_t k::Image::getWidth()
+{return this->reader->getWidth();}
+
+int32_t k::Image::getHeight()
+{return this->reader->getHeight();}
+
+void k::Image::printData()
+{this->reader->printData();}
+
 bool k::Image::setReder(std::unique_ptr<ImageReader> reader) {
         this->reader = std::move(reader);
         if (this->reader == nullptr) {return false;}
         return true;
 }
-
-k::image_data::Response k::Image::getData()
-{return this->reader->getData();}
-
-void k::Image::printData()
-{this->reader->printData();}
