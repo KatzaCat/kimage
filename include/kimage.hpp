@@ -4,28 +4,25 @@
 #include <string>
 #include <vector>
 
-#include "imagereader.hpp"
+#include "imageprocessor.hpp"
 
 namespace k {
         class Image {
         public:
                 Image() = default;
 
-                Image(std::unique_ptr<ImageReader> reader);
-                Image(std::unique_ptr<ImageReader> reader, const std::string file);
+                Image(std::unique_ptr<ImageProcessor> processor);
+                Image(std::unique_ptr<ImageProcessor> processor, const std::string file);
 
                 bool load(std::string file);
 
-                image_data::Response getResponse();
-                std::vector<unsigned char> getRawData();
+                std::vector<unsigned char> getData();
 
                 int32_t getWidth();
                 int32_t getHeight();
-
-                void printData();
         private:
-                std::unique_ptr<ImageReader> reader = {};
+                std::unique_ptr<ImageProcessor> processor  = {};
         private:
-                bool setReder(std::unique_ptr<ImageReader> reader);
+                bool setProcessor(std::unique_ptr<ImageProcessor> processor);
         };
 }
