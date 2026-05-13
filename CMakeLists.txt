@@ -33,6 +33,7 @@ endif()
 # Examples
 if(KI_EXAMPLE)
         message("Building Examples")
+        add_subdirectory(example)
 endif()
 
 # Tests
