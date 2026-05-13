@@ -40,16 +40,20 @@ k::image_data::Response k::BMPReader::getResponse()
 std::vector<unsigned char> k::BMPReader::getRawData() {
         std::vector<unsigned char> raw_data;
 
-        for (size_t index = 0; index < this->pixel_data.size(); index++) {
-                unsigned char red   = static_cast<unsigned char>((this->pixel_data.at(index) >> 24) & 0b11111111);
-                unsigned char green = static_cast<unsigned char>((this->pixel_data.at(index) >> 16) & 0b11111111);
-                unsigned char blue  = static_cast<unsigned char>((this->pixel_data.at(index) >> 8)  & 0b11111111);
-                unsigned char alfa  = static_cast<unsigned char>( this->pixel_data.at(index)        & 0b11111111);
+        for (size_t y_index = this->image_height - 1; y_index > 0; y_index--) {
+                for (size_t x_index = 0; x_index < this->image_width; x_index++) {
+                        uint32_t pixel = this->pixel_data.at((y_index * this->image_height) + x_index);
 
-                raw_data.push_back(red);
-                raw_data.push_back(green);
-                raw_data.push_back(blue);
-                raw_data.push_back(alfa);
+                        unsigned char red   = static_cast<unsigned char>((pixel >> 24) & 0b11111111);
+                        unsigned char green = static_cast<unsigned char>((pixel >> 16) & 0b11111111);
+                        unsigned char blue  = static_cast<unsigned char>((pixel >> 8)  & 0b11111111);
+                        unsigned char alfa  = static_cast<unsigned char>( pixel        & 0b11111111);
+
+                        raw_data.push_back(red);
+                        raw_data.push_back(green);
+                        raw_data.push_back(blue);
+                        raw_data.push_back(alfa);
+                }
         }
 
         return raw_data;
