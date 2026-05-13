@@ -41,10 +41,10 @@ std::vector<unsigned char> k::BMPReader::getRawData() {
         std::vector<unsigned char> raw_data;
 
         for (size_t index = 0; index < this->pixel_data.size(); index++) {
-                unsigned char red   = (this->pixel_data.at(index) >> 24) | 0x00000000000000000000000011111111;
-                unsigned char green = (this->pixel_data.at(index) >> 16) | 0x00000000000000000000000011111111;
-                unsigned char blue  = (this->pixel_data.at(index) >> 8)  | 0x00000000000000000000000011111111;
-                unsigned char alfa  =  this->pixel_data.at(index)        | 0x00000000000000000000000011111111;
+                unsigned char red   = static_cast<unsigned char>((this->pixel_data.at(index) >> 24) & 0b11111111);
+                unsigned char green = static_cast<unsigned char>((this->pixel_data.at(index) >> 16) & 0b11111111);
+                unsigned char blue  = static_cast<unsigned char>((this->pixel_data.at(index) >> 8)  & 0b11111111);
+                unsigned char alfa  = static_cast<unsigned char>( this->pixel_data.at(index)        & 0b11111111);
 
                 raw_data.push_back(red);
                 raw_data.push_back(green);
