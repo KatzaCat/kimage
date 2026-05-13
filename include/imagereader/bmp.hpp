@@ -6,6 +6,8 @@
 #include <functional>
 #include <vector>
 
+#define BMP_FILE_NOT_FOUND_ERROR 0x10001
+
 namespace k {
         class BMPReader : public ImageReader {
         public:
@@ -13,12 +15,13 @@ namespace k {
 
                 virtual bool load(const std::string file_name) override;
 
-                virtual image_data::Response getData() override;
-
-                virtual void printData() override;
+                virtual image_data::Response getResponse() override;
+                virtual std::vector<unsigned char> getRawData() override;
 
                 virtual int32_t getWidth() override;
                 virtual int32_t getHeight() override;
+
+                virtual void printData() override;
         private:
                 image_data::Response response = {};
 
