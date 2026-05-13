@@ -24,6 +24,9 @@ set(KGF_BMP_24BIT_TEST bmp_24bit_test)
 set(KGF_BMP_32BIT_NAME bmp_32bit)
 set(KGF_BMP_32BIT_TEST bmp_32bit_test)
 
+set(KGF_BMP_RAW_DATA_NAME bmp_raw_data)
+set(KGF_BMP_RAW_DATA_TEST bmp_raw_data_test)
+
 # Add tests
 add_executable(${KGF_DEPENDENCY_INJECTION_NAME} dependency_injection.cpp)
 target_link_libraries(${KGF_DEPENDENCY_INJECTION_NAME} PRIVATE kimage::kimage)
@@ -54,3 +57,8 @@ add_executable(${KGF_BMP_32BIT_NAME} ${KGF_BMP_32BIT_NAME}.cpp)
 target_link_libraries(${KGF_BMP_32BIT_NAME} PRIVATE kimage::kimage)
 target_compile_features(${KGF_BMP_32BIT_NAME} PUBLIC cxx_std_23)
 add_test(NAME ${KGF_BMP_32BIT_TEST} COMMAND ${KGF_BMP_32BIT_NAME} WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+
+add_executable(${KGF_BMP_RAW_DATA_NAME} ${KGF_BMP_RAW_DATA_NAME}.cpp)
+target_link_libraries(${KGF_BMP_RAW_DATA_NAME} PRIVATE kimage::kimage)
+target_compile_features(${KGF_BMP_RAW_DATA_NAME} PUBLIC cxx_std_23)
+add_test(NAME ${KGF_BMP_RAW_DATA_TEST} COMMAND ${KGF_BMP_RAW_DATA_NAME} WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")

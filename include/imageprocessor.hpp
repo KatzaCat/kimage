@@ -4,33 +4,19 @@
 #include <cstdint>
 #include <fstream>
 #include <string>
-#include <variant>
 #include <vector>
 
 namespace k {
-        namespace image_data {
-                enum Type {
-                        ERROR,
-                        DATA
-                };
-
-                struct Response {
-                        Type type;
-                        std::variant<std::vector<std::byte>, int> information;
-                };
-        }
-
-        class ImageReader {
+        class ImageProcessor {
         public:
-                std::vector<std::byte> data;
+                std::vector<std::byte> byte_data = {};
+                std::vector<uint32_t> pixel_data = {};
         public:
-                virtual ~ImageReader() = default;
+                virtual ~ImageProcessor() = default;
 
                 virtual bool load(const std::string file_name) = 0;
 
-                virtual image_data::Response getData() = 0;
-
-                virtual void printData() = 0;
+                std::vector<unsigned char> getData();
 
                 virtual int32_t getWidth() = 0;
                 virtual int32_t getHeight() = 0;
