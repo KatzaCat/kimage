@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "imagereader.hpp"
 
@@ -15,12 +16,16 @@ namespace k {
 
                 bool load(std::string file);
 
-                bool setReder(std::unique_ptr<ImageReader> reader);
+                image_data::Response getResponse();
+                std::vector<unsigned char> getRawData();
 
-                image_data::Response getData();
+                int32_t getWidth();
+                int32_t getHeight();
 
                 void printData();
         private:
                 std::unique_ptr<ImageReader> reader = {};
+        private:
+                bool setReder(std::unique_ptr<ImageReader> reader);
         };
 }
