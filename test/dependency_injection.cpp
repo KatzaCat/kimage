@@ -8,7 +8,7 @@ int main() {
 
         // test to see if works
         image.load("BMP_test.bmp");
-        (void)image.getData();
+        (void)image.getResponse();
 
         return 0;
 }
