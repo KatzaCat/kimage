@@ -5,6 +5,7 @@
 #include <fstream>
 #include <string>
 #include <variant>
+#include <memory>
 #include <vector>
 
 namespace k {
@@ -28,12 +29,13 @@ namespace k {
 
                 virtual bool load(const std::string file_name) = 0;
 
-                virtual image_data::Response getData() = 0;
-
-                virtual void printData() = 0;
+                virtual image_data::Response getResponse() = 0;
+                virtual std::vector<unsigned char> getRawData() = 0;
 
                 virtual int32_t getWidth() = 0;
                 virtual int32_t getHeight() = 0;
+
+                virtual void printData() = 0;
         protected:
                 bool populateDataFromFile(std::ifstream &file);
 
