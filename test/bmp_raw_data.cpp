@@ -1,4 +1,4 @@
-#include "imagereader/bmp.hpp"
+#include "imageprocessor/bmp.hpp"
 #include <cstddef>
 #include <kimage.hpp>
 #include <memory>
@@ -7,9 +7,9 @@
 //#include <print>
 
 int main() {
-        k::Image image(std::make_unique<k::BMPReader>(), "images/BMP32bit.bmp");
+        k::Image image(std::make_unique<k::BMPProcessor>(), "images/BMP32bit.bmp");
 
-        std::vector<unsigned char> image_data_vector = image.getRawData();
+        std::vector<unsigned char> image_data_vector = image.getData();
 
         unsigned char *raw_data = image_data_vector.data();
         size_t raw_data_size = image_data_vector.size();
