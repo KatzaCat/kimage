@@ -4,11 +4,10 @@
 #include "SDL3/SDL_render.h"
 #include "SDL3/SDL_surface.h"
 #include "SDL3/SDL_video.h"
-#include "imagereader/bmp.hpp"
+#include "imageprocessor/bmp.hpp"
 #include "kimage.hpp"
 
 #include <memory>
-#include <print>
 #include <vector>
 
 int main() {
@@ -19,9 +18,9 @@ int main() {
 
         bool is_running = true;
 
-        k::Image image(std::make_unique<k::BMPReader>(), "images/BMP32bit.bmp");
-        std::vector<unsigned char> pixels = image.getRawData();
-        unsigned char *raw_pixel_data = pixels.data();
+        k::Image image(std::make_unique<k::BMPProcessor>(), "images/BMP32bit.bmp");
+        std::vector<unsigned char> pixel_date = image.getData();
+        unsigned char *raw_pixel_data = pixel_date.data();
 
         SDL_Surface *surface = SDL_CreateSurfaceFrom(
                 image.getWidth(), image.getHeight(),
@@ -33,8 +32,6 @@ int main() {
         SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
         float texture_width = surface->w * 20;
         float texture_height = surface->h * 20;
-        std::println("texture w: {}", texture_width);
-        std::println("texture h: {}", texture_height);
 
         SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
 
@@ -44,9 +41,6 @@ int main() {
         destination_rect.y = static_cast<float>((720 - texture_height) / 2);
         destination_rect.w = texture_width;
         destination_rect.h = texture_height;
-
-        std::println("destination w: {}", texture_width);
-        std::println("destination h: {}", texture_height);
 
         while (is_running) {
                 SDL_Event event;
