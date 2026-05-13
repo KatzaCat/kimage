@@ -15,8 +15,11 @@
 bool k::BMPReader::load(const std::string file_name) {
         std::ifstream binary_file(file_name, std::ios::binary);
 
-        if (!binary_file.is_open())
-        {return false;}
+        if (!binary_file.is_open()) {
+                this->response.type = image_data::ERROR;
+                this->response.information = BMP_FILE_NOT_FOUND_ERROR;
+                return false;
+        }
 
         this->populateDataFromFile(binary_file);
         this->populateBMPData();
@@ -25,15 +28,38 @@ bool k::BMPReader::load(const std::string file_name) {
 
         binary_file.close();
 
-        return true;
-}
-
-k::image_data::Response k::BMPReader::getData() {
         this->response.type = image_data::DATA;
         this->response.information = this->data;
 
-        return this->response;
+        return true;
 }
+
+k::image_data::Response k::BMPReader::getResponse()
+{return this->response;}
+
+std::vector<unsigned char> k::BMPReader::getRawData() {
+        std::vector<unsigned char> raw_data;
+
+        for (size_t index = 0; index < this->pixel_data.size(); index++) {
+                unsigned char red   = (this->pixel_data.at(index) >> 24) | 0x00000000000000000000000011111111;
+                unsigned char green = (this->pixel_data.at(index) >> 16) | 0x00000000000000000000000011111111;
+                unsigned char blue  = (this->pixel_data.at(index) >> 8)  | 0x00000000000000000000000011111111;
+                unsigned char alfa  =  this->pixel_data.at(index)        | 0x00000000000000000000000011111111;
+
+                raw_data.push_back(red);
+                raw_data.push_back(green);
+                raw_data.push_back(blue);
+                raw_data.push_back(alfa);
+        }
+
+        return raw_data;
+}
+
+int32_t k::BMPReader::getWidth()
+{return this->image_width;}
+
+int32_t k::BMPReader::getHeight()
+{return this->image_height;}
 
 void k::BMPReader::printData() {
         for (size_t index = 0; index < this->data.size(); index++) {
@@ -66,12 +92,6 @@ void k::BMPReader::printData() {
         }
         std::println("]");
 }
-
-int32_t k::BMPReader::getWidth()
-{return this->image_width;}
-
-int32_t k::BMPReader::getHeight()
-{return this->image_height;}
 
 void k::BMPReader::populateBMPData() {
         this->pixel_data_offset = this->getFourBytesLittleEndian(10);
@@ -109,7 +129,7 @@ void k::BMPReader::populateColorTable() {
 
                 this->color_table.at(index) = tools::toInt32(
                         tools::toInt16(red, green),
-                        tools::toInt16(blue, std::byte(0))
+                        tools::toInt16(blue, std::byte(0xFF))
                 );
         }
 }
