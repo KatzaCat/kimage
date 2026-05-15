@@ -4,10 +4,8 @@
 #include "SDL3/SDL_render.h"
 #include "SDL3/SDL_surface.h"
 #include "SDL3/SDL_video.h"
-#include "imageprocessor/bmp.hpp"
 #include "kimage.hpp"
 
-#include <memory>
 #include <vector>
 
 int main() {
@@ -18,7 +16,7 @@ int main() {
 
         bool is_running = true;
 
-        k::Image image(std::make_unique<k::BMPProcessor>(), "images/BMP32bit.bmp");
+        k::Image image("images/BMP32bit.bmp");
         std::vector<unsigned char> pixel_date = image.getData();
         unsigned char *raw_pixel_data = pixel_date.data();
 

@@ -11,8 +11,7 @@ namespace k {
         public:
                 Image() = default;
 
-                Image(std::unique_ptr<ImageProcessor> processor);
-                Image(std::unique_ptr<ImageProcessor> processor, const std::string file);
+                Image(const std::string file);
 
                 bool load(std::string file);
 

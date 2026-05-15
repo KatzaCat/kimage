@@ -1,13 +1,10 @@
-#include "imageprocessor/bmp.hpp"
 #include <cstddef>
 #include <kimage.hpp>
-#include <memory>
 #include <print>
 #include <vector>
-//#include <print>
 
 int main() {
-        k::Image image(std::make_unique<k::BMPProcessor>(), "images/BMP32bit.bmp");
+        k::Image image("images/BMP32bit.bmp");
 
         std::vector<unsigned char> image_data_vector = image.getData();
 
