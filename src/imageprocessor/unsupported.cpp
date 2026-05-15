@@ -7,10 +7,25 @@ bool k::UnsupportedProcessor::load(const std::string file_name) {return false;}
 std::vector<unsigned char> k::UnsupportedProcessor::getData() {
         std::vector<unsigned char> unsupported_image = {};
 
-        unsupported_image.push_back(static_cast<unsigned char>(0xFF00FFFF));
-        unsupported_image.push_back(static_cast<unsigned char>(0x000000FF));
-        unsupported_image.push_back(static_cast<unsigned char>(0x000000FF));
-        unsupported_image.push_back(static_cast<unsigned char>(0xFF00FFFF));
+        unsupported_image.push_back(static_cast<unsigned char>(0xFF));
+        unsupported_image.push_back(static_cast<unsigned char>(0x00));
+        unsupported_image.push_back(static_cast<unsigned char>(0xFF));
+        unsupported_image.push_back(static_cast<unsigned char>(0xFF));
+
+        unsupported_image.push_back(static_cast<unsigned char>(0x00));
+        unsupported_image.push_back(static_cast<unsigned char>(0x00));
+        unsupported_image.push_back(static_cast<unsigned char>(0x00));
+        unsupported_image.push_back(static_cast<unsigned char>(0xFF));
+
+        unsupported_image.push_back(static_cast<unsigned char>(0x00));
+        unsupported_image.push_back(static_cast<unsigned char>(0x00));
+        unsupported_image.push_back(static_cast<unsigned char>(0x00));
+        unsupported_image.push_back(static_cast<unsigned char>(0xFF));
+
+        unsupported_image.push_back(static_cast<unsigned char>(0xFF));
+        unsupported_image.push_back(static_cast<unsigned char>(0x00));
+        unsupported_image.push_back(static_cast<unsigned char>(0xFF));
+        unsupported_image.push_back(static_cast<unsigned char>(0xFF));
 
         return unsupported_image;
 }
