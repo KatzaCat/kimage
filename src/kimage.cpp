@@ -8,16 +8,12 @@
 
 static std::unique_ptr<k::ImageProcessor> _processorFactory(std::string file) {
         size_t extetion_position = file.find_last_of('.');
-        std::string extention = "";
+        std::string extention = file.substr(extetion_position);
 
-        if (extetion_position != std::string::npos) {
-                std::string extention = file.substr(extetion_position);
+        if (extention == ".bmp" || extention == ".dib")
+        {return std::make_unique<k::BMPProcessor>();}
 
-                if (extention == ".bmp" || extention == ".dib")
-                {return std::make_unique<k::BMPProcessor>();}
-        }
-
-        std::println("KImage does not {} files", extention);
+        std::println("KImage does not suport {} files", extention);
         return std::make_unique<k::UnsupportedProcessor>();
 }
 
