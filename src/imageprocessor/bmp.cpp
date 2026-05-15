@@ -16,7 +16,7 @@ bool k::BMPProcessor::load(const std::string file_name) {
         if (!binary_file.is_open())
         {return false;}
 
-        this->populateDataFromFile(binary_file);
+        this->data.populateFromFile(binary_file);
         this->populateColorTable();
         this->populatePixelData();
 
@@ -25,14 +25,17 @@ bool k::BMPProcessor::load(const std::string file_name) {
         return true;
 }
 
+std::vector<unsigned char> k::BMPProcessor::getData()
+{return this->data.format(this->getWidth(), this->getHeight());}
+
 int32_t k::BMPProcessor::getWidth()
-{return this->getFourBytesLittleEndian(18);}
+{return this->data.getFourBytesLittleEndian(18);}
 
 int32_t k::BMPProcessor::getHeight()
-{return this->getFourBytesLittleEndian(22);}
+{return this->data.getFourBytesLittleEndian(22);}
 
 int32_t k::BMPProcessor::getBitsPerPixel()
-{return this->getTwoBytesLittleEndian(28);}
+{return this->data.getTwoBytesLittleEndian(28);}
 
 void k::BMPProcessor::populateColorTable() {
         if (this->getBitsPerPixel() > 8) {
@@ -42,7 +45,7 @@ void k::BMPProcessor::populateColorTable() {
 
         size_t offset = 54;
         size_t bytes_per_entry = 4;
-        uint32_t compression_level = this->getFourBytesLittleEndian(30);
+        uint32_t compression_level = this->data.getFourBytesLittleEndian(30);
 
         this->color_table.resize(std::pow(2, this->getBitsPerPixel()));
 
@@ -54,9 +57,9 @@ void k::BMPProcessor::populateColorTable() {
         for (size_t index = 0; index < this->color_table.size(); index++) {
                 size_t current_offset = color_table_offset + (bytes_per_entry * index);
 
-                std::byte red = this->getByte(current_offset + 2);
-                std::byte green = this->getByte(current_offset + 1);
-                std::byte blue = this->getByte(current_offset);
+                std::byte red = this->data.getByte(current_offset + 2);
+                std::byte green = this->data.getByte(current_offset + 1);
+                std::byte blue = this->data.getByte(current_offset);
 
                 this->color_table.at(index) = tools::toInt32(
                         tools::toInt16(red, green),
@@ -66,8 +69,6 @@ void k::BMPProcessor::populateColorTable() {
 }
 
 void k::BMPProcessor::populatePixelData() {
-        this->bytes_per_row = (this->getWidth() * this->getBitsPerPixel() + 7) / 8;
-
         switch (this->getBitsPerPixel()) {
                 case 1:  this->processPixelBytes([this]() {this->bytes_per_pixel = 1; this->process1Bit();});  break;
                 case 2:  this->processPixelBytes([this]() {this->bytes_per_pixel = 1; this->process2Bit();});  break;
@@ -80,9 +81,10 @@ void k::BMPProcessor::populatePixelData() {
 }
 
 void k::BMPProcessor::processPixelBytes(std::function<void()> function) {
-        int32_t pixel_data_padding = (4 - (this->bytes_per_row % 4)) % 4;
+        int32_t bytes_per_row = (this->getWidth() * this->getBitsPerPixel() + 7) / 8;
+        int32_t pixel_data_padding = (4 - (bytes_per_row % 4)) % 4;
 
-        this->pixel_data_index = this->getFourBytesLittleEndian(10);
+        this->pixel_data_index = this->data.getFourBytesLittleEndian(10);
         for (size_t row_index = 0; row_index < this->getHeight(); row_index++) {
                 this->pixels_read = 0;
 
@@ -94,14 +96,14 @@ void k::BMPProcessor::processPixelBytes(std::function<void()> function) {
 }
 
 void k::BMPProcessor::process1Bit() {
-        std::bitset<8> bitset = k::tools::toBitset(this->getByte(this->pixel_data_index++));
+        std::bitset<8> bitset = k::tools::toBitset(this->data.getByte(this->pixel_data_index++));
 
         for (uint8_t index = 0; (index < bitset.size() && (pixels_read < this->getWidth())); index++)
-        {this->pixel_data.push_back(this->color_table.at(bitset[index])); pixels_read++;}
+        {this->data.pushPixel(this->color_table.at(bitset[index])); pixels_read++;}
 }
 
 void k::BMPProcessor::process2Bit() {
-        std::byte byte = this->getByte(this->pixel_data_index++);
+        std::byte byte = this->data.getByte(this->pixel_data_index++);
 
         uint8_t color_index_1 = (static_cast<uint8_t>(byte) >> 6) & 0b00000011;
         uint8_t color_index_2 = (static_cast<uint8_t>(byte) >> 4) & 0b00000011;
@@ -109,37 +111,37 @@ void k::BMPProcessor::process2Bit() {
         uint8_t color_index_4 =  static_cast<uint8_t>(byte)       & 0b00000011;
 
         if (pixels_read < this->getWidth())
-        {this->pixel_data.push_back(this->color_table.at(color_index_1)); pixels_read++;}
+        {this->data.pushPixel(this->color_table.at(color_index_1)); pixels_read++;}
         if (pixels_read < this->getWidth())
-        {this->pixel_data.push_back(this->color_table.at(color_index_2)); pixels_read++;}
+        {this->data.pushPixel(this->color_table.at(color_index_2)); pixels_read++;}
         if (pixels_read < this->getWidth())
-        {this->pixel_data.push_back(this->color_table.at(color_index_3)); pixels_read++;}
+        {this->data.pushPixel(this->color_table.at(color_index_3)); pixels_read++;}
         if (pixels_read < this->getWidth())
-        {this->pixel_data.push_back(this->color_table.at(color_index_4)); pixels_read++;}
+        {this->data.pushPixel(this->color_table.at(color_index_4)); pixels_read++;}
 }
 
 void k::BMPProcessor::process4Bit() {
-        std::byte byte = this->getByte(this->pixel_data_index++);
+        std::byte byte = this->data.getByte(this->pixel_data_index++);
 
         uint8_t color_index_1 = (static_cast<uint8_t>(byte) >> 4) & 0b00001111;
         uint8_t color_index_2 =  static_cast<uint8_t>(byte)       & 0b00001111;
 
         if (this->pixels_read < this->getWidth())
-        {this->pixel_data.push_back(this->color_table.at(color_index_1)); this->pixels_read++;}
+        {this->data.pushPixel(this->color_table.at(color_index_1)); this->pixels_read++;}
         if (this->pixels_read < this->getWidth())
-        {this->pixel_data.push_back(this->color_table.at(color_index_2)); this->pixels_read++;}
+        {this->data.pushPixel(this->color_table.at(color_index_2)); this->pixels_read++;}
 }
 
 void k::BMPProcessor::process8Bit() {
-        std::byte byte = this->getByte(this->pixel_data_index++);
+        std::byte byte = this->data.getByte(this->pixel_data_index++);
 
         if (this->pixels_read < this->getWidth())
-        {this->pixel_data.push_back(this->color_table.at(static_cast<uint8_t>(byte))); this->pixels_read++;}
+        {this->data.pushPixel(this->color_table.at(static_cast<uint8_t>(byte))); this->pixels_read++;}
 }
 
 void k::BMPProcessor::process16Bit() {
-        std::byte byte1 = this->getByte(this->pixel_data_index++);
-        std::byte byte2 = this->getByte(this->pixel_data_index++);
+        std::byte byte1 = this->data.getByte(this->pixel_data_index++);
+        std::byte byte2 = this->data.getByte(this->pixel_data_index++);
 
         uint16_t color_data = k::tools::toInt16(byte1, byte2);
 
@@ -152,29 +154,29 @@ void k::BMPProcessor::process16Bit() {
         uint16_t back_bytes = k::tools::toInt16(blue, alfa);
 
         if (this->pixels_read < this->getWidth())
-        {this->pixel_data.push_back(k::tools::toInt32(frount_bytes, back_bytes)); this->pixels_read++;}
+        {this->data.pushPixel(k::tools::toInt32(frount_bytes, back_bytes)); this->pixels_read++;}
 }
 
 void k::BMPProcessor::process24Bit() {
-        std::byte blue  = this->getByte(this->pixel_data_index++);
-        std::byte green = this->getByte(this->pixel_data_index++);
-        std::byte red   = this->getByte(this->pixel_data_index++);
+        std::byte blue  = this->data.getByte(this->pixel_data_index++);
+        std::byte green = this->data.getByte(this->pixel_data_index++);
+        std::byte red   = this->data.getByte(this->pixel_data_index++);
 
         uint16_t frount_bytes = k::tools::toInt16(red, green);
         uint16_t back_bytes = k::tools::toInt16(blue, std::byte(0xFF));
 
         if (this->pixels_read < this->getWidth())
-        {this->pixel_data.push_back(k::tools::toInt32(frount_bytes, back_bytes)); this->pixels_read++;}
+        {this->data.pushPixel(k::tools::toInt32(frount_bytes, back_bytes)); this->pixels_read++;}
 }
 
 void k::BMPProcessor::process32Bit() {
-        std::byte blue  = this->getByte(this->pixel_data_index++);
-        std::byte green = this->getByte(this->pixel_data_index++);
-        std::byte red   = this->getByte(this->pixel_data_index++);
-        std::byte alfa  = this->getByte(this->pixel_data_index++);
+        std::byte blue  = this->data.getByte(this->pixel_data_index++);
+        std::byte green = this->data.getByte(this->pixel_data_index++);
+        std::byte red   = this->data.getByte(this->pixel_data_index++);
+        std::byte alfa  = this->data.getByte(this->pixel_data_index++);
 
         uint16_t frount_bytes = k::tools::toInt16(red, green);
         uint16_t back_bytes = k::tools::toInt16(blue, alfa);
 
-        this->pixel_data.push_back(k::tools::toInt32(frount_bytes, back_bytes));
+        this->data.pushPixel(k::tools::toInt32(frount_bytes, back_bytes));
 }

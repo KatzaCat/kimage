@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../imageprocessor.hpp"
+#include "imagedata.hpp"
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -13,17 +14,17 @@ namespace k {
 
                 virtual bool load(const std::string file_name) override;
 
+                virtual std::vector<unsigned char> getData() override;
+
                 virtual int32_t getWidth() override;
                 virtual int32_t getHeight() override;
         private:
-                size_t pixel_data_index = 0;
-
                 std::vector<uint32_t> color_table = {};
 
-                int32_t bytes_per_row = 0;
                 int32_t bytes_per_pixel = 0;
-
                 size_t pixels_read = 0;
+                size_t pixel_data_index = 0;
+                ImageData data = {};
         private:
                 int32_t getBitsPerPixel();
 

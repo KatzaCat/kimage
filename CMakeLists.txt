@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 4.2.0)
 
-project(kimage LANGUAGES CXX VERSION 5.12.26)
+project(kimage LANGUAGES CXX VERSION 5.15.26)
 
 # Have CMake export compile commands
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -8,6 +8,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Add the library
 add_library(${PROJECT_NAME} STATIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kimage.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/imagedata.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/imageprocessor.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/imageprocessor/bmp.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/tools/int_type.cpp
