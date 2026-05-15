@@ -1,11 +1,14 @@
 #include "kimage.hpp"
 #include "imageprocessor.hpp"
 #include "imageprocessor/bmp.hpp"
+#include "imageprocessor/unsupported.hpp"
 #include <cstddef>
 #include <memory>
+#include <print>
 
 static std::unique_ptr<k::ImageProcessor> _processorFactory(std::string file) {
         size_t extetion_position = file.find_last_of('.');
+        std::string extention = "";
 
         if (extetion_position != std::string::npos) {
                 std::string extention = file.substr(extetion_position);
@@ -14,7 +17,8 @@ static std::unique_ptr<k::ImageProcessor> _processorFactory(std::string file) {
                 {return std::make_unique<k::BMPProcessor>();}
         }
 
-        return nullptr;
+        std::println("KImage does not {} files", extention);
+        return std::make_unique<k::UnsupportedProcessor>();
 }
 
 k::Image::Image(const std::string file)
