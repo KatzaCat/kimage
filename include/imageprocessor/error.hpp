@@ -3,9 +3,9 @@
 #include "../imageprocessor.hpp"
 
 namespace k {
-        class UnsupportedProcessor : public ImageProcessor {
+        class ErrorProcessor : public ImageProcessor {
         public:
-                virtual ~UnsupportedProcessor() = default;
+                virtual ~ErrorProcessor() = default;
 
                 virtual bool load(const std::string file_name) override;
 

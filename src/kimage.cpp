@@ -1,7 +1,7 @@
 #include "kimage.hpp"
 #include "imageprocessor.hpp"
 #include "imageprocessor/bmp.hpp"
-#include "imageprocessor/unsupported.hpp"
+#include "imageprocessor/error.hpp"
 #include <cstddef>
 #include <memory>
 #include <print>
@@ -14,7 +14,7 @@ static std::unique_ptr<k::ImageProcessor> _processorFactory(std::string file) {
         {return std::make_unique<k::BMPProcessor>();}
 
         std::println("KImage does not suport {} files", extention);
-        return std::make_unique<k::UnsupportedProcessor>();
+        return std::make_unique<k::ErrorProcessor>();
 }
 
 k::Image::Image(const std::string file)
@@ -25,7 +25,10 @@ bool k::Image::load(const std::string file) {
         if (!this->setProcessor(std::move(current_processor))) {return false;}
 
         bool error_value = this->processor->load(file);
-        if (!error_value) {return false;}
+        if (!error_value) {
+                this->setProcessor(std::make_unique<k::ErrorProcessor>());
+                return false;
+        }
 
         return true;
 }
@@ -41,6 +44,10 @@ int32_t k::Image::getHeight()
 
 bool k::Image::setProcessor(std::unique_ptr<ImageProcessor> processor) {
         this->processor = std::move(processor);
-        if (this->processor == nullptr) {return false;}
+        if (this->processor == nullptr) {
+                this->processor = std::make_unique<k::ErrorProcessor>();
+                return false;
+        }
+
         return true;
 }
