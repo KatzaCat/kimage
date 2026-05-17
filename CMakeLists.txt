@@ -10,6 +10,7 @@ add_library(${PROJECT_NAME} STATIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kimage.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/imagedata.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/imageprocessor.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/imageprocessor/png.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/imageprocessor/bmp.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/imageprocessor/error.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/tools/int_type.cpp
