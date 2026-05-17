@@ -2,7 +2,7 @@
 
 #include <fstream>
 
-bool k::PngProcessor::load(const std::string file_name) {
+bool k::PNGProcessor::load(const std::string file_name) {
         std::ifstream binary_file(file_name, std::ios::binary);
 
         if (!binary_file.is_open())
@@ -15,12 +15,12 @@ bool k::PngProcessor::load(const std::string file_name) {
         return true;
 }
 
-std::vector<unsigned char> k::PngProcessor::getData() {
+std::vector<unsigned char> k::PNGProcessor::getData() {
         return {};
 }
 
-int32_t k::PngProcessor::getWidth()
+int32_t k::PNGProcessor::getWidth()
 {return 0;}
 
-int32_t k::PngProcessor::getHeight()
+int32_t k::PNGProcessor::getHeight()
 {return 0;}

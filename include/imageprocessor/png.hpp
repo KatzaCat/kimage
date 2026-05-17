@@ -2,9 +2,9 @@
 #include "imageprocessor.hpp"
 
 namespace k {
-        class PngProcessor : public ImageProcessor {
+        class PNGProcessor : public ImageProcessor {
         public:
-                virtual ~PngProcessor() = default;
+                virtual ~PNGProcessor() = default;
 
                 virtual bool load(const std::string file_name) override;
 
