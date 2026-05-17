@@ -2,6 +2,7 @@
 #include "imageprocessor.hpp"
 #include "imageprocessor/bmp.hpp"
 #include "imageprocessor/error.hpp"
+#include "imageprocessor/png.hpp"
 #include <cstddef>
 #include <memory>
 #include <print>
@@ -12,6 +13,9 @@ static std::unique_ptr<k::ImageProcessor> _processorFactory(std::string file) {
 
         if (extention == ".bmp" || extention == ".dib")
         {return std::make_unique<k::BMPProcessor>();}
+
+        if (extention == ".png")
+        {return std::make_unique<k::PNGProcessor>();}
 
         std::println("KImage does not suport {} files", extention);
         return std::make_unique<k::ErrorProcessor>();
