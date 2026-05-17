@@ -62,8 +62,8 @@ uint16_t k::ImageData::getTwoBytesBigEndian(size_t offset)
 
 uint32_t k::ImageData::getFourBytesBigEndian(size_t offset) {
         return  tools::toInt32(
-                this->getFourBytesBigEndian(offset),
-                this->getFourBytesBigEndian(offset + 2)
+                this->getTwoBytesBigEndian(offset),
+                this->getTwoBytesBigEndian(offset + 2)
         );
 }
 
