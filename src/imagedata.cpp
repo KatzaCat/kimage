@@ -45,6 +45,12 @@ std::vector<unsigned char> k::ImageData::format(int32_t width, int32_t height) {
         return raw_data;
 }
 
+size_t k::ImageData::getByteArraySize()
+{return this->bytes.size();}
+
+size_t k::ImageData::getPixelArraySize()
+{return this->pixels.size();}
+
 std::byte k::ImageData::getByte(size_t offset) {
         if (offset >= this->bytes.size() || offset < 0)
         {return std::byte(0);}

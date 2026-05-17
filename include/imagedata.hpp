@@ -12,6 +12,9 @@ namespace k {
 
                 std::vector<unsigned char> format(int32_t width, int32_t height);
 
+                size_t getByteArraySize();
+                size_t getPixelArraySize();
+
                 std::byte getByte(size_t offset);
 
                 uint16_t getTwoBytesBigEndian(size_t offset);
