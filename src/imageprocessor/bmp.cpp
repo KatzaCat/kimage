@@ -34,6 +34,9 @@ int32_t k::BMPProcessor::getWidth()
 int32_t k::BMPProcessor::getHeight()
 {return this->data.getFourBytesLittleEndian(22);}
 
+std::string k::BMPProcessor::getName() 
+{return "BMP Processor";}
+
 int32_t k::BMPProcessor::getBitsPerPixel()
 {return this->data.getTwoBytesLittleEndian(28);}
 

@@ -33,3 +33,6 @@ std::vector<unsigned char> k::ErrorProcessor::getData() {
 int32_t k::ErrorProcessor::getWidth() {return 2;}
 
 int32_t k::ErrorProcessor::getHeight() {return 2;}
+
+std::string k::ErrorProcessor::getName() 
+{return "Error Processor";}

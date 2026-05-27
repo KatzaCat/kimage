@@ -18,6 +18,8 @@ namespace k {
 
                 virtual int32_t getWidth() override;
                 virtual int32_t getHeight() override;
+
+                virtual std::string getName() override;
         private:
                 std::vector<uint32_t> color_table = {};
 

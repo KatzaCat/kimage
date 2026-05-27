@@ -15,5 +15,7 @@ namespace k {
 
                 virtual int32_t getWidth() = 0;
                 virtual int32_t getHeight() = 0;
+
+                virtual std::string getName() = 0;
         };
 }

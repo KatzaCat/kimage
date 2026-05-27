@@ -13,5 +13,7 @@ namespace k {
 
                 virtual int32_t getWidth() override;
                 virtual int32_t getHeight() override;
+
+                virtual std::string getName() override;
         };
 }
