@@ -6,6 +6,7 @@ CD ./build
           -G "Unix Makefiles" ^
           -DKI_TEST=TRUE      ^
           -DKI_EXAMPLE=FALSE  ^
+          -DKI_TEST_RUN="%1"  ^
           ..
 
         ECHO ===== Make =====
