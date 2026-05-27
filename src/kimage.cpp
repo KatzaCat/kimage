@@ -30,6 +30,7 @@ bool k::Image::load(const std::string file) {
 
         bool error_value = this->processor->load(file);
         if (!error_value) {
+                std::println("Failed to load {}", this->processor->getName());
                 this->setProcessor(std::make_unique<k::ErrorProcessor>());
                 return false;
         }
