@@ -2,3 +2,4 @@
 build/
 # Vscode 
 .vscode
+.editorconfig
