@@ -1,7 +1,6 @@
 #include "imageprocessor/png.hpp"
 #include "tools/int_type.hpp"
 
-#include <bit>
 #include <fstream>
 #include <print>
 
