@@ -3,7 +3,7 @@
 CD ./build
 
         cmake                 ^
-          -G "Unix Makefiles" ^
+          -G "MinGW Makefiles" ^
           -DKI_TEST=FALSE     ^
           -DKI_EXAMPLE=FALSE  ^
           ..
