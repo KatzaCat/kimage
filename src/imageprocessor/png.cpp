@@ -1,10 +1,13 @@
 #include "imageprocessor/png.hpp"
 #include "tools/int_type.hpp"
 
+#include <cstddef>
+#include <cstdint>
 #include <fstream>
 #include <print>
 
 #define INFORMATION_HEADER 0x49484452
+#define IMAGE_DATA         0x49444154
 
 // debug
 std::string _u32ToString(uint32_t number) {
@@ -56,7 +59,7 @@ bool k::PNGProcessor::load(const std::string file_name) {
 
         // debug
         std::println("Bit Depth          : {}", static_cast<unsigned char>(this->bit_depth));
-        std::println("Color Type         : {}", static_cast<unsigned char>(this->color_type));
+        std::println("Color Type         : {}", static_cast<unsigned char>(this->image_type));
         std::println("Compression Method : {}", static_cast<unsigned char>(this->compression_method));
         std::println("Filter Method      : {}", static_cast<unsigned char>(this->filter_method));
         std::println("Interlace Method   : {}", static_cast<unsigned char>(this->interlace_method));
@@ -66,9 +69,8 @@ bool k::PNGProcessor::load(const std::string file_name) {
         return true;
 }
 
-std::vector<unsigned char> k::PNGProcessor::getData() {
-        return {};
-}
+std::vector<unsigned char> k::PNGProcessor::getData() 
+{return this->data.format(this->getWidth(), this->getHeight());}
 
 int32_t k::PNGProcessor::getWidth()
 {return this->width;}
@@ -130,6 +132,8 @@ bool k::PNGProcessor::processChunks() {
         for (size_t index = 0; index < this->chunks.size(); index++) {
                 switch (this->chunks.at(index).type) {
                         case INFORMATION_HEADER: return_value = this->processInformationHeader(index); break;
+                        case IMAGE_DATA:         return_value = this->processImageData(index);         break;
+
                         default: break;
                 }
         }
@@ -137,7 +141,7 @@ bool k::PNGProcessor::processChunks() {
         return return_value;
 }
 
-static k::png::ImageType _getImageType(int color_type, int bit_depth) {
+static k::png::ImageType _getImageType(int color_type) {
         k::png::ImageType type = k::png::ImageType::Error;
 
         switch (color_type) {
@@ -150,16 +154,22 @@ static k::png::ImageType _getImageType(int color_type, int bit_depth) {
                 default: type = k::png::ImageType::Error; break;
         }
 
-        switch (type) {
-                case k::png::ImageType::Greyscale:                                                                                                     break;
-                case k::png::ImageType::Truecolor:          if (bit_depth == 1 || bit_depth == 2 || bit_depth == 4) {type = k::png::ImageType::Error;} break;
-                case k::png::ImageType::Indexed:            if (bit_depth == 16)                                    {type = k::png::ImageType::Error;} break;
-                case k::png::ImageType::GreyscaleWithAlpha: if (bit_depth == 1 || bit_depth == 2 || bit_depth == 4) {type = k::png::ImageType::Error;} break;
-                case k::png::ImageType::TrueColorWithAlpha: if (bit_depth == 1 || bit_depth == 2 || bit_depth == 4) {type = k::png::ImageType::Error;} break;
-                case k::png::ImageType::Error:                                                                                                         break;
+        return type;
+}
+
+static bool _isValidImageType(k::png::ImageType image_type, std::byte bit_depth) {
+        int depth = static_cast<int>(bit_depth);
+
+        switch (image_type) {
+                case k::png::ImageType::Greyscale:                                                       return true;   break;
+                case k::png::ImageType::Truecolor:          if (depth == 1 || depth == 2 || depth == 4) {return false;} break;
+                case k::png::ImageType::Indexed:            if (depth == 16)                            {return false;} break;
+                case k::png::ImageType::GreyscaleWithAlpha: if (depth == 1 || depth == 2 || depth == 4) {return false;} break;
+                case k::png::ImageType::TrueColorWithAlpha: if (depth == 1 || depth == 2 || depth == 4) {return false;} break;
+                case k::png::ImageType::Error:                                                           return false;  break;
         }
 
-        return type;
+        return true;
 }
 
 bool k::PNGProcessor::processInformationHeader(size_t index) {
@@ -173,12 +183,28 @@ bool k::PNGProcessor::processInformationHeader(size_t index) {
         );
 
         this->bit_depth = this->chunks.at(index).data.at(8);
-        this->image_type = _getImageType(static_cast<int>(this->chunks.at(index).data.at(9)), static_cast<int>(this->bit_depth));
-        if (this->image_type == png::ImageType::Error) {return false;}
+        this->image_type = _getImageType(static_cast<int>(this->chunks.at(index).data.at(9)));
+        if (!_isValidImageType(this->image_type, this->bit_depth)) {return false;}
 
         this->compression_method = this->chunks.at(index).data.at(10);
         this->filter_method = this->chunks.at(index).data.at(11);
         this->interlace_method = this->chunks.at(index).data.at(12); 
+
+        return true;
+}
+
+
+
+bool k::PNGProcessor::processImageData(size_t index) {
+        Data data = this->chunks.at(index).data;
+
+        std::byte compression_method_and_flags = data.at(0);
+        uint8_t data_compression_method = (static_cast<uint8_t>(compression_method_and_flags) >> 5) & 0b11111111;
+        uint8_t data_compression_information = static_cast<uint8_t>(compression_method_and_flags) & 0b00011111;
+
+        std::println("data_compression_method      : {}", data_compression_method);
+        std::println("data_compression_information : {}", data_compression_information);
+
 
         return true;
 }

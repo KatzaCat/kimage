@@ -7,17 +7,17 @@ namespace k {
                 struct Chunk {
                         uint32_t length = 0;
                         uint32_t type = 0;
-                        std::vector<std::byte> data = {};
+                        Data data = {};
                         uint32_t crc = 0;
                 };
 
                 enum struct ImageType : int {
-                        Error,
-                        Greyscale,
-                        Truecolor,
-                        Indexed,
-                        GreyscaleWithAlpha,
-                        TrueColorWithAlpha
+                        Error = 0xFF,
+                        Greyscale = 0,
+                        Truecolor = 2,
+                        Indexed = 3,
+                        GreyscaleWithAlpha = 4,
+                        TrueColorWithAlpha = 6
                 };
         }
 
@@ -41,8 +41,6 @@ namespace k {
                 std::vector<png::Chunk> chunks = {};
 
                 std::byte bit_depth = std::byte(0);
-
-                std::byte color_type = std::byte(0);
                 png::ImageType image_type = {};
 
                 std::byte compression_method = std::byte(0);
@@ -54,5 +52,8 @@ namespace k {
                 void loadChunks();
                 bool processChunks();
                 bool processInformationHeader(size_t index);
+                bool processImageData(size_t index);
+
+                Data decompressImageData(Data data);
         };
 }

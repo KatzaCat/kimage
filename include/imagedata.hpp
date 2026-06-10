@@ -3,6 +3,8 @@
 #include <vector>
 #include <fstream>
 
+using Data = std::vector<std::byte>;
+
 namespace k {
         class ImageData {
         public:
@@ -23,7 +25,7 @@ namespace k {
                 uint16_t getTwoBytesLittleEndian(size_t offset);
                 uint32_t getFourBytesLittleEndian(size_t offset);
         private:
-                std::vector<std::byte> bytes = {};
+                Data bytes = {};
                 std::vector<uint32_t> pixels = {};
         };
 }
